@@ -106,7 +106,11 @@ class EventMailer
   rescue StandardError => e
     Rails.logger.error { e.inspect }
 
-    raise e if is_db_connection_error?(e)
+    reconnect if db_connection_error?(e)
+  end
+
+  def reconnect
+    ActiveRecord::Base.connection.reconnect!
   end
 
   def verify_jwt(payload, signer)
@@ -115,8 +119,9 @@ class EventMailer
                              options.compact
   end
 
-  def is_db_connection_error?(exception)
-    exception.is_a?(Mysql2::Error::ConnectionError) || exception.cause.is_a?(Mysql2::Error)
+  def db_connection_error?(exception)
+    exception.is_a?(Mysql2::Error::ConnectionError) &&
+      exception.message == 'MySQL server has gone away'
   end
 
   class << self
