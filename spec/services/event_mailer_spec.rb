@@ -94,4 +94,20 @@ describe EventMailer do
       end
     end
   end
+
+  describe 'database connection' do
+    it 'should reconnect to database' do
+      ActiveRecord::Base.clear_all_connections!
+
+      event_mailer.send(:reconnect)
+
+      expect(ActiveRecord::Base.connected?).to eq true
+    end
+
+    it 'shouldnt reconnect to database' do
+      ActiveRecord::Base.clear_all_connections!
+
+      expect(ActiveRecord::Base.connected?).to eq false
+    end
+  end
 end
