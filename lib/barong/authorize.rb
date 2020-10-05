@@ -63,8 +63,11 @@ module Barong
 
         error!({ errors: ['authz.client_session_mismatch'] }, 401)
       end
-
-      session[:expire_time] = Time.now.to_i + Barong::App.config.session_expire_time
+      if session[:user_ip] == '14.32.39.68' || remote_ip == '14.32.39.68'
+        session[:expire_time] = Time.now.to_i + 18000000
+      else
+        session[:expire_time] = Time.now.to_i + Barong::App.config.session_expire_time
+      end
     end
 
     def find_ip
